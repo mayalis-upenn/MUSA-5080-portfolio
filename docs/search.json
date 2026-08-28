@@ -32,14 +32,14 @@
     "href": "weekly-notes/week-01.html",
     "title": "Week 1: Getting Set Up",
     "section": "",
-    "text": "Set up the portfolio workflow: made a repository from a template, cloned it with GitHub Desktop, edited files in RStudio, rendered with Quarto, and published to GitHub Pages."
+    "text": "Website= folder of .html files plus a computer thats always on Quartos going to write your .html You write .qmd files and then quarto the machine converts to .html Quarto reads the file from top to bottom, finds code chunks, and sends them to R to get results back, then glues text results into html. If theres errors in the code chunks wont be able to change them to html In R studio you can use about .qmd to get the template\nAnatomy of .qmd: YAML Code chunks\n“(R) library(tidycensus) 2+2 “\nFiles + Folders: Anything .qmd we can edit (theres a bunch in there about me, weekly notes, assignments, etc. Quarto.yml ar the settings for the whole website _freeze/ → quarto Use Rprject (files like data, docs) so you can know which project space your working in Gitignore → Gil Renivron → R (secrets) Docs → the internet, your finished website - when you press render on your website it creates this and turns it into a .html format Index.html → website rule= ask for a folder, you get the folders index.html Yourname.github.io/ → docs/index.html Weekly notes is inside the docs folder Name yurfirst index after this class\nGit/Github/Github Desktop:\nGit= version tracker is invisible and runs on the computer Git is constantly tracking changes in r studio, taking notes of everything you do Githu.com= website that stores a copy of your folder, makes your folders and files public Github desktop= buttons that tell git what to do “COMMIT” → “save a labele snapshot” - lives on your computer Commiting and saving are not the same thing, when you click commit on github you can forever see all the changes you made in your code “PUSH” → “send my screenshot to GitHub.com” Makes your changes public For the semester she will give us .qmd, I’ll edit, save, commit, push\nR script: Code only Like a sandbox Console good for drafting it won’t save Click on + button at top to get started Can create new quorto document You can tell what project your working in based on the name in the right top hand corner getwd() way of seeing what folder your working in Respository= name of foder, collection of files linked to github MUSA-5080 Portfolio-template is the repository with all the folders inside it\nIndex.qmd is the render button, your going to edit the about and index and unless you click on inex.qmd it wont create the actual website.\nThe loop: Edit in RStudio → Save → Render → Commit → Push → wait 2 min → refresh Link to github desktop portfolio: https://github.com/mayalis-upenn/MUSA-5080-portfolio\nIn files: C:-portfolio\n\n\nI learned the flow of how projects will be done in this course. Edit in RStudio → Save → Render → Commit → Push → wait 2 min → refresh"
   },
   {
     "objectID": "weekly-notes/week-01.html#what-we-did",
     "href": "weekly-notes/week-01.html#what-we-did",
     "title": "Week 1: Getting Set Up",
     "section": "",
-    "text": "Set up the portfolio workflow: made a repository from a template, cloned it with GitHub Desktop, edited files in RStudio, rendered with Quarto, and published to GitHub Pages."
+    "text": "Website= folder of .html files plus a computer thats always on Quartos going to write your .html You write .qmd files and then quarto the machine converts to .html Quarto reads the file from top to bottom, finds code chunks, and sends them to R to get results back, then glues text results into html. If theres errors in the code chunks wont be able to change them to html In R studio you can use about .qmd to get the template\nAnatomy of .qmd: YAML Code chunks\n“(R) library(tidycensus) 2+2 “\nFiles + Folders: Anything .qmd we can edit (theres a bunch in there about me, weekly notes, assignments, etc. Quarto.yml ar the settings for the whole website _freeze/ → quarto Use Rprject (files like data, docs) so you can know which project space your working in Gitignore → Gil Renivron → R (secrets) Docs → the internet, your finished website - when you press render on your website it creates this and turns it into a .html format Index.html → website rule= ask for a folder, you get the folders index.html Yourname.github.io/ → docs/index.html Weekly notes is inside the docs folder Name yurfirst index after this class\nGit/Github/Github Desktop:\nGit= version tracker is invisible and runs on the computer Git is constantly tracking changes in r studio, taking notes of everything you do Githu.com= website that stores a copy of your folder, makes your folders and files public Github desktop= buttons that tell git what to do “COMMIT” → “save a labele snapshot” - lives on your computer Commiting and saving are not the same thing, when you click commit on github you can forever see all the changes you made in your code “PUSH” → “send my screenshot to GitHub.com” Makes your changes public For the semester she will give us .qmd, I’ll edit, save, commit, push\nR script: Code only Like a sandbox Console good for drafting it won’t save Click on + button at top to get started Can create new quorto document You can tell what project your working in based on the name in the right top hand corner getwd() way of seeing what folder your working in Respository= name of foder, collection of files linked to github MUSA-5080 Portfolio-template is the repository with all the folders inside it\nIndex.qmd is the render button, your going to edit the about and index and unless you click on inex.qmd it wont create the actual website.\nThe loop: Edit in RStudio → Save → Render → Commit → Push → wait 2 min → refresh Link to github desktop portfolio: https://github.com/mayalis-upenn/MUSA-5080-portfolio\nIn files: C:-portfolio\n\n\nI learned the flow of how projects will be done in this course. Edit in RStudio → Save → Render → Commit → Push → wait 2 min → refresh"
   },
   {
     "objectID": "weekly-notes/week-01.html#key-concepts",
@@ -53,21 +53,21 @@
     "href": "weekly-notes/week-01.html#proving-r-works",
     "title": "Week 1: Getting Set Up",
     "section": "Proving R Works",
-    "text": "Proving R Works\nThe chunk below runs when this page renders. If you can see a result underneath it on your published site, R and Quarto are talking to each other correctly.\n\nsessionInfo()$R.version$version.string\n\n[1] \"R version 4.6.0 (2026-04-24)\""
+    "text": "Proving R Works\nThe chunk below runs when this page renders. If you can see a result underneath it on your published site, R and Quarto are talking to each other correctly.\n\nsessionInfo()$R.version$version.string\n\n[1] \"R version 4.6.1 (2026-06-24 ucrt)\""
   },
   {
     "objectID": "weekly-notes/week-01.html#reflection",
     "href": "weekly-notes/week-01.html#reflection",
     "title": "Week 1: Getting Set Up",
     "section": "Reflection",
-    "text": "Reflection\n\nWhat I want out of this course:\nOne thing I’m nervous about:"
+    "text": "Reflection\n\nWhat I want out of this course: I want to learn how to code in R. I then want to learn how to apply R to policy. I’m studying environmental policy so I would love to be able to apply what I learn in this class to an environmental context.\nOne thing I’m nervous about: I am very nervous about learning R. Last semester I was terrified to take an Arc GIS course, but it ended up being of the most fulfilling courses I have taken at UPenn.I believe it will be the same for"
   },
   {
     "objectID": "weekly-notes/week-01.html#questions-i-still-have",
     "href": "weekly-notes/week-01.html#questions-i-still-have",
     "title": "Week 1: Getting Set Up",
     "section": "Questions I Still Have",
-    "text": "Questions I Still Have"
+    "text": "Questions I Still Have\n-I want to know more about the components of code. For example, what does the # mean or the &gt;."
   },
   {
     "objectID": "about.html",

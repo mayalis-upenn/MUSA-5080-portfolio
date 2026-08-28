@@ -8,9 +8,73 @@ date: 2026-08-28
 
 <!-- CHANGE THIS: replace with your own notes -->
 
-Set up the portfolio workflow: made a repository from a template, cloned it with
-GitHub Desktop, edited files in RStudio, rendered with Quarto, and published to
-GitHub Pages.
+
+Website= folder of .html files plus a computer thats always on
+Quartos going to write your .html 
+You write .qmd files and then quarto the machine converts to .html
+Quarto reads the file from top to bottom, finds code chunks, and sends them to R to get results back, then glues text results into html.
+If theres errors in the code chunks wont be able to change them to html
+In R studio you can use about .qmd to get the template
+
+Anatomy of .qmd:
+YAML
+Code chunks
+
+“(R)
+library(tidycensus)
+2+2
+“
+
+Files + Folders:
+Anything .qmd we can edit (theres a bunch in there about me, weekly notes, assignments, etc.
+Quarto.yml ar the settings for the whole website
+_freeze/ → quarto
+Use Rprject (files like data, docs) so you can know which project space your working in
+Gitignore → Gil
+Renivron → R (secrets)
+Docs → the internet, your finished website - when you press render on your website it creates this and turns it into a .html format
+Index.html → website rule= ask for a folder, you get the folders index.html
+Yourname.github.io/ → docs/index.html
+Weekly notes is inside the docs folder
+Name yurfirst index after this class
+
+Git/Github/Github Desktop:
+
+Git= version tracker is invisible and runs on the computer 
+Git is constantly tracking changes in r studio, taking notes of everything you do
+Githu.com= website that stores a copy of your folder, makes your folders and files public
+Github desktop= buttons that tell git what to do
+“COMMIT” → “save a labele snapshot” - lives on your computer
+Commiting and saving are not the same thing, when you click commit on github you can forever see all the changes you made in your code
+“PUSH” → “send my screenshot to GitHub.com”
+Makes your changes public
+For the semester she will give us .qmd, I’ll edit, save, commit, push
+
+R script:
+Code only
+Like a sandbox
+Console good for drafting it won’t save
+Click on + button at top to get started 
+Can create new quorto document 
+You can tell what project your working in based on the name in the right top hand corner 
+getwd() way of seeing what folder your working in
+Respository= name of foder, collection of files linked to github
+MUSA-5080 Portfolio-template is the repository with all the folders inside it
+
+Index.qmd is the render button, your going to edit the about and index and unless you click on inex.qmd it wont create the actual website.
+
+The loop:
+Edit in RStudio → Save → Render → Commit → Push → wait 2 min → refresh
+Link to github desktop portfolio: https://github.com/mayalis-upenn/MUSA-5080-portfolio
+
+In files: C:\Users\mayal\OneDrive\Documents\MUSA-5080-portfolio
+
+### whats I learned today
+I learned the flow of how projects will be done in this course. Edit in RStudio → Save → Render → Commit → Push → wait 2 min → refresh
+
+
+
+
 
 ## Key Concepts
 
@@ -35,11 +99,10 @@ sessionInfo()$R.version$version.string
 
 <!-- CHANGE THIS: 3-4 sentences -->
 
-What I want out of this course:
+What I want out of this course: I want to learn how to code in R. I then want to learn how to apply R to policy. I'm studying environmental policy so I would love to be able to apply what I learn in this class to an environmental context.
 
-One thing I'm nervous about:
+One thing I'm nervous about: I am very nervous about learning R. Last semester I was terrified to take an Arc GIS course, but it ended up being of the most fulfilling courses I have taken at UPenn.I believe it will be the same for 
 
 ## Questions I Still Have
 
--
--
+-I want to know more about the components of code. For example, what does the # mean or the >.
