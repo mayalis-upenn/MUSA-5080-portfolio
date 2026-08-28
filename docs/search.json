@@ -72,37 +72,37 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About",
+    "title": "About Me",
     "section": "",
-    "text": "Write a few paragraphs about yourself here: where you came from before MUSA, what drew you to urban spatial analytics, and what you’re hoping to do with it."
+    "text": "I’m originally from Florida. I did my undergraduate at UC Berkeley studying environmental policy. I am interested in Waste management policy, specifically composting work. I’m hoping to be able to use the skills I learn in this class to be able to understand and analyze waste management data on a deeper level."
   },
   {
     "objectID": "about.html#background",
     "href": "about.html#background",
-    "title": "About",
+    "title": "About Me",
     "section": "",
-    "text": "Write a few paragraphs about yourself here: where you came from before MUSA, what drew you to urban spatial analytics, and what you’re hoping to do with it."
+    "text": "I’m originally from Florida. I did my undergraduate at UC Berkeley studying environmental policy. I am interested in Waste management policy, specifically composting work. I’m hoping to be able to use the skills I learn in this class to be able to understand and analyze waste management data on a deeper level."
   },
   {
     "objectID": "about.html#skills",
     "href": "about.html#skills",
-    "title": "About",
+    "title": "About Me",
     "section": "Skills",
     "text": "Skills\n\n\nLanguages & Tools: R, Quarto, Git\nSpatial: (add as you learn)\nData: US Census / ACS via tidycensus"
   },
   {
     "objectID": "about.html#contact",
     "href": "about.html#contact",
-    "title": "About",
+    "title": "About Me",
     "section": "Contact",
-    "text": "Contact\n\n\nEmail: your-email@upenn.edu\nGitHub: @your-username"
+    "text": "Contact\n\n\nEmail: mayalis@upenn.edu\nGitHub: @mayalis-upenn"
   },
   {
     "objectID": "assignments/index.html",
     "href": "assignments/index.html",
     "title": "Assignments",
     "section": "",
-    "text": "Completed assignments for MUSA 5080. New assignments appear here automatically once you add the .qmd file to this folder and render.\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Completed assignments for MUSA 5080. New assignments appear here automatically once you add the .qmd file to this folder and render.\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "weekly-notes/index.html",
