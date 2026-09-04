@@ -1,0 +1,44 @@
+---
+title: "Week 2: Getting Set Up"
+description: "First impressions, and getting the workflow running."
+date: 2026-08-28
+---
+
+## What We Did
+
+<!-- CHANGE THIS: replace with your own notes -->
+
+
+notes...
+
+### whats I learned today
+We did a quiz today and then learned about algorithms in government, R & dplyr foundations, and Census and ACS.
+
+
+
+
+
+## Key Concepts
+
+notes
+
+The loop: **Edit → Save → Render → Commit → Push → wait → refresh**
+
+## Proving R Works
+
+The chunk below runs when this page renders. If you can see a result underneath
+it on your published site, R and Quarto are talking to each other correctly.
+
+```{r}
+sessionInfo()$R.version$version.string
+```
+
+## Reflection
+
+<!-- CHANGE THIS: 3-4 sentences -->
+
+
+
+## Questions I Still Have
+
+- >.
