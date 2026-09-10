@@ -1,11 +1,9 @@
 {
-  "hash": "0422c2db6c79acd9973bc96394f7bd90",
+  "hash": "9655476420e7fe74bbcfb806b223c6bf",
   "result": {
     "engine": "knitr",
-    "markdown": "---\ntitle: \"Week 2: Getting Set Up\"\ndescription: \"First impressions, and getting the workflow running.\"\ndate: 2026-08-28\n---\n\n## What We Did\n\n<!-- CHANGE THIS: replace with your own notes -->\n\n\nnotes...\n\n### whats I learned today\nWe did a quiz today and then learned about algorithms in government, R & dplyr foundations, and Census and ACS.\n\n\n\n\n\n## Key Concepts\n\nnotes\n\nThe loop: **Edit → Save → Render → Commit → Push → wait → refresh**\n\n## Proving R Works\n\nThe chunk below runs when this page renders. If you can see a result underneath\nit on your published site, R and Quarto are talking to each other correctly.\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsessionInfo()$R.version$version.string\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n[1] \"R version 4.6.1 (2026-06-24 ucrt)\"\n```\n\n\n:::\n:::\n\n\n## Reflection\n\n<!-- CHANGE THIS: 3-4 sentences -->\n\n\n\n## Questions I Still Have\n\n- >.\n",
-    "supporting": [
-      "week-02_files"
-    ],
+    "markdown": "---\ntitle: \"Week 2: dplyr and Census\"\ndescription: \"Table functions and acs data.\"\ndate: 2026-09-04\n---\n\n## What We Did\n\n<!-- CHANGE THIS: replace with your own notes -->\n\n\nnotes...\n\n### whats I learned today\nWe did a quiz today and then learned about algorithms in government, R & dplyr foundations, and Census and ACS.\n\n\n\n\n\n## Key Concepts\n\nnotes\n\nThe loop: **Edit → Save → Render → Commit → Push → wait → refresh**\n\n## Proving R Works\n\nThe chunk below runs when this page renders. If you can see a result underneath\nit on your published site, R and Quarto are talking to each other correctly.\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsessionInfo()$R.version$version.string\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n[1] \"R version 4.6.1 (2026-06-24 ucrt)\"\n```\n\n\n:::\n:::\n\n\n## Reflection\n\n<!-- CHANGE THIS: 3-4 sentences -->\n\n\n\n## Questions I Still Have\n\n- >.\n",
+    "supporting": [],
     "filters": [
       "rmarkdown/pagebreak.lua"
     ],

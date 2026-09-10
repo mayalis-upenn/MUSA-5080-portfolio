@@ -1,7 +1,7 @@
 ---
-title: "Week 2: Getting Set Up"
-description: "First impressions, and getting the workflow running."
-date: 2026-08-28
+title: "Week 2: dplyr and Census"
+description: "Table functions and acs data."
+date: 2026-09-04
 ---
 
 ## What We Did
@@ -9,7 +9,202 @@ date: 2026-08-28
 <!-- CHANGE THIS: replace with your own notes -->
 
 
-notes...
+Console= where you would run a big line of code just to see if it works, your code disappears, its not saved or made public
+R-script no one can see
+Code chunk live inside .qmd → for the finest products it should work
+Result ← filter (countirs, population > 50000) # keep the big ones!
+Result= object that holds the result
+← = assignment flow  (basically an = sign)
+filter= function name (verb)
+counties= input data 
+population > 50000 = arguments
+#= comment the code does not run
+With some data thats called countries , the 
+This is a very common code through this semster
+Packages
+install.packaages(“dplyr”) 
+Just do this once
+Library (dplyr) 
+Eveytime you want to use this package need to put this
+Library (tidycensus)
+
+				Column, variable, data fram = tible (nicer, grints, prettier)
+Observations → 
+Name
+Income
+MDE
+Adams
+Adams
+78975
+3334
+Berks
+Berks
+74617
+1191
+Bucks
+Bucks
+104200
+1502
+
+
+Tibble= a data frame
+Tible → verb → tibble
+Filter () → deals with rows (both have an r easy way to remember)
+Select () → pick columns
+Mutate () → and a new computed column
+New ← mutate (counties, income2)
+This adds a new column for this
+Arrange () → change order of rows (might put in ascending order or descending order)
+Group_by()+ → many rows become few
+Summary ()
+Example below:
+
+
+
+County
+State
+Income
+Orange
+NY
+70,000
+Nassau
+NY
+80,000
+Orange
+CA
+90,000
+Scremento
+CA
+100,000
+
+
+ ↓   This is what group and summary do… they limit the data set down
+
+State
+Min Income
+NY
+70,000
+CA
+90,000
+
+
+
+Example- This method is too much theres a shortcut way
+
+Observations → 
+Name
+Income
+MDE
+Moe_pct
+Adams
+Adams
+78975
+3334
+9
+Berks
+Berks
+74617
+1191
+11
+Bucks
+Bucks
+104200
+1502
+11
+
+
+Step 1 ← filter (counties, moe_pct>10)
+Step 2 ← arrange (step1, desc(moe_pct))
+Step 3 ← select (NAME, moe_pct))
+
+Name
+MOE_PCT
+Berks 
+12
+Bucks
+11
+
+
+SHORTCUT WAY- The Pipe= way of accomplishing same thing as above in a quicker all together way
+
+“And then”
+ %>%
+
+New_data  ← counties %>%
+Filter (mpe_pct>10) %>%
+Arrange (desc(moe_pct) %>%
+Select (NAME, moe_pct)
+
+Dececnnial census, maed every 10 years and has 10 questions
+Long form
+American community survey, implemented in 2005 so newer data
+3% pof hosuholds surveeyerd
+Esgtimates for the population
+1 year ACS - places >65,000 most current 
+3 yr ACS - DEAD no longer exists
+5 yr ACS - Block Group Tract (NORMALLY ALWAYS GOING TO BE ACS 5 FOR US)
+
+Data from the tiny census:
+B19013_001E
+19013= table number
+001= line number
+E= estimate M=MOE
+
+State
+	County
+		Tract=  “neighborhood” census tract, boundaries change all the time
+Block group has a high MOE
+A block is the smallest unit- decimal only
+
+GEOID
+42   101 000100 (tract has 11 digits)
+State     county      tract 
+
+String= how GEOID is banded together 
+In a table of a census ID the 0’s at the start of the states are lost 
+
+Data ← get_acs (geography= “county”,
+variable s= c (B19013_001E”,
+	“B19013_001E”),
+
+State= “PA”
+Year= 2023,
+Survey= “acs5”
+output= “wide”
+
+TIDY (long)
+
+Geold
+Name
+Varibale
+Estimate
+MOE
+42001
+Adams
+B19013_001
+78975
+3334
+42001
+Adams
+B01003_001
+104604
+NA
+
+ 
+Don’t want data in format above want whats in data below, to do this and make it y-axis data need to put output= “wide”
+
+Geold
+Name
+B19013_001E
+M
+
+
+Adams
+78975
+3334
+
+
+
 
 ### whats I learned today
 We did a quiz today and then learned about algorithms in government, R & dplyr foundations, and Census and ACS.
