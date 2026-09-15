@@ -16,7 +16,8 @@ poverty_2010 <- get_acs(
   state = my_state,
   county = "Philadelphia",
   year = 2010,
-  survey = "acs5"
+  survey = "acs5",
+  output= "wide"
 )
 
 head(poverty_2010)
@@ -27,7 +28,18 @@ poverty_2017 <- get_acs(
   state = my_state,
   county = "Philadelphia",
   year = 2017,
-  survey = "acs5"
+  survey = "acs5",
+  output= "wide"
 )
 
 head(poverty_2017)
+
+poverty_2010 <- poverty_2010 %>%
+  mutate(
+    cv = poverty_moe / poverty_rate * 100
+  )
+
+poverty_2017 <- poverty_2017 %>%
+  mutate(
+    cv = poverty_moe / poverty_rate * 100
+  )
