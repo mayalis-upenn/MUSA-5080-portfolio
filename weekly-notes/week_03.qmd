@@ -1,0 +1,27 @@
+---
+title: "week_03"
+format: html
+---
+
+Ex. imagine says the number ofp popeole riding bikes in the city dropped from 25% to 20%
+
+                  Estimate      ACS MOE → tells us the 90% confidence interval
+2015=           20%                    +/- 3
+2023=            25%                    +/- 4
+
+Z score= 1.64 < 1.645 so not statistically signifigant
+
+SEdiff= (standard error difference)
+Why 1.645 in SE? It represents 90? Confidence interval so its a magic #
+
+If z score is < or = to 1.645 then its not statistically significant
+If its above then its statistically significant 
+
+Sampling noise= when a small sample size fails to represent the true underlying distribution
+
+What to do with data that has too much sampling noise?
+
+Can get more data
+Can merge values together
+*More data you have the better your calculations
+

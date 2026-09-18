@@ -25,7 +25,7 @@ library(tidycensus)
 
 ## The question
 
-Every number the American Community Survey publishes is an estimate drawn from a
+**Every number** the American Community Survey publishes is an estimate drawn from a
 sample, not a count. That means every number comes with a margin of error — a
 statement about how wrong it might be.
 

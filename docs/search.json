@@ -46,7 +46,7 @@
     "href": "weekly-notes/index.html",
     "title": "Weekly Notes",
     "section": "",
-    "text": "Notes from each week of MUSA 5080. New entries appear here automatically — add a .qmd file to this folder and render.\n\n\n\n\n\n\n\n\n\n\n\nWeek 2: dplyr and Census\n\n\nTable functions and acs data.\n\n\n\n\n\nSep 4, 2026\n\n\n\n\n\n\n\nWeek 1: Getting Set Up\n\n\nFirst impressions, and getting the workflow running.\n\n\n\n\n\nAug 28, 2026\n\n\n\n\n\nNo matching items"
+    "text": "Notes from each week of MUSA 5080. New entries appear here automatically — add a .qmd file to this folder and render.\n\n\n\n\n\n\n\n\n\n\n\nweek_03\n\n\n\n\n\n\n\n\n\n\n\n\n\nWeek 2: dplyr and Census\n\n\nTable functions and acs data.\n\n\n\n\n\nSep 4, 2026\n\n\n\n\n\n\n\nWeek 1: Getting Set Up\n\n\nFirst impressions, and getting the workflow running.\n\n\n\n\n\nAug 28, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "data/readme.html",
@@ -208,5 +208,12 @@
     "title": "Week 1: Getting Set Up",
     "section": "Questions I Still Have",
     "text": "Questions I Still Have\n-I want to know more about the components of code. For example, what does the # mean or the &gt;."
+  },
+  {
+    "objectID": "weekly-notes/week_03.html",
+    "href": "weekly-notes/week_03.html",
+    "title": "week_03",
+    "section": "",
+    "text": "Ex. imagine says the number ofp popeole riding bikes in the city dropped from 25% to 20%\n              Estimate      ACS MOE → tells us the 90% confidence interval\n2015= 20% +/- 3 2023= 25% +/- 4\nZ score= 1.64 &lt; 1.645 so not statistically signifigant\nSEdiff= (standard error difference) Why 1.645 in SE? It represents 90? Confidence interval so its a magic #\nIf z score is &lt; or = to 1.645 then its not statistically significant If its above then its statistically significant\nSampling noise= when a small sample size fails to represent the true underlying distribution\nWhat to do with data that has too much sampling noise?\nCan get more data Can merge values together *More data you have the better your calculations"
   }
 ]
