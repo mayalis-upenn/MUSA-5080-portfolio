@@ -1,0 +1,287 @@
+---
+  title: "Verify the Claim: Holmesburg recorded the highest increase, from 2 percent to 19 percent between the 2006-10 survey and the 2013-17 survey"
+author: "Maya Lis"
+date: today
+format:
+  html:
+  toc: true
+code-fold: true
+code-summary: "Show code"
+embed-resources: true
+---
+
+
+
+#Part 1 (Introduction)-
+
+
+#My two variables include the following; B17001_001: Poverty Status in the Past 12 Months by Sex by Age and and B17001_002 refers to the total number of people in poverty. Dividing the number of people below poverty by the total population for which poverty is calculated allows me to calculate the poverty rate and compare it between the surveys.I used the acs5 since the claim from the article uses data from the acs5 to compare two years. I used the surveys from 2010 and 2017.The survey periods the articles bases its claims on do not overlap.
+
+
+
+
+#Part 2 (Here we go...)-
+
+
+library(tidycensus)
+library(tidyverse)
+
+my_state <- "PA"
+my_variable <- c("B17001_001", "B17001_002")
+
+poverty_2010 <- get_acs(
+  geography = "tract",
+  variables = my_variable,
+  state = my_state,
+  county = "Philadelphia",
+  year = 2010,
+  survey = "acs5",
+  output= "wide"
+)
+
+head(poverty_2010)
+
+poverty_2017 <- get_acs(
+  geography = "tract",
+  variables = my_variable,
+  state = my_state,
+  county = "Philadelphia",
+  year = 2017,
+  survey = "acs5",
+  output= "wide"
+)
+
+head(poverty_2017)
+
+
+poverty_2010 <- poverty_2010 %>%
+  mutate(
+    poverty_rate = B17001_002E / B17001_001E * 100,
+    poverty_moe = moe_prop(
+      B17001_002E,
+      B17001_001E,
+      B17001_002M,
+      B17001_001M
+    ),
+    cv = poverty_moe / poverty_rate * 100
+  )
+
+
+head(poverty_2010)
+
+poverty_2010 %>%
+  select(NAME, poverty_rate, poverty_moe, cv) %>%
+  head(10)
+
+poverty_2017 <- poverty_2017 %>%
+  mutate(
+    poverty_rate = B17001_002E / B17001_001E * 100,
+    poverty_moe = moe_prop(
+      B17001_002E,
+      B17001_001E,
+      B17001_002M,
+      B17001_001M
+    ),
+    cv = poverty_moe / poverty_rate * 100
+  )
+
+
+head(poverty_2017)
+
+poverty_2017 <- poverty_2017 %>%
+  mutate(
+    reliability = case_when(
+      cv < 12 ~ "Reliable",
+      cv <= 40 ~ "Somewhat reliable",
+      cv > 40 ~ "Unreliable"
+    )
+  )
+
+head(poverty_2017)
+
+poverty_2010 <- poverty_2010 %>%
+  mutate(
+    reliability = case_when(
+      cv < 12 ~ "Reliable",
+      cv <= 40 ~ "Somewhat reliable",
+      cv > 40 ~ "Unreliable"
+    )
+  )
+
+head(poverty_2010)
+
+poverty_2010 %>%
+  select(GEOID, poverty_rate, poverty_moe, cv, reliability) %>%
+  head(10)
+
+poverty_2017 %>%
+  select(GEOID, poverty_rate, poverty_moe, cv, reliability) %>%
+  head(10)
+
+poverty_2010_change <- poverty_2010 %>%
+  select(GEOID, poverty_rate, poverty_moe)
+
+poverty_2017_change <- poverty_2017 %>%
+  select(GEOID, poverty_rate, poverty_moe)
+
+poverty_change <- poverty_2010_change %>%
+  left_join(poverty_2017_change, by = "GEOID")
+
+head(poverty_change)
+
+poverty_change <- poverty_change %>%
+  rename(
+    poverty_rate_2010 = poverty_rate.x,
+    poverty_moe_2010 = poverty_moe.x,
+    poverty_rate_2017 = poverty_rate.y,
+    poverty_moe_2017 = poverty_moe.y
+  )
+
+head(poverty_change)
+
+
+poverty_change <- poverty_change %>%
+  mutate(
+    change = poverty_rate_2017 - poverty_rate_2010
+  )
+
+head(poverty_change)
+
+poverty_tested <- poverty_change %>%
+  mutate(
+    se_2010 = poverty_moe_2010 / 1.645,
+    se_2017 = poverty_moe_2017 / 1.645,
+    se_diff = sqrt(se_2010^2 + se_2017^2),
+    moe_diff = se_diff * 1.645,
+    z = change / se_diff,
+    significant = abs(z) > 1.645
+  )
+
+head(poverty_tested)
+
+poverty_tested %>%
+  count(significant)
+
+poverty_tested %>%
+  arrange(z) %>%
+  head(20)
+
+poverty_tested %>%
+  arrange(z) %>%
+  tail(20)
+
+# 65 tracts show a statistically detectable change at a 90% confidence interval, while 311 tracts do not. There are 8 tracts with NA results. Looking at the data set, it appears all of these NA tracts did not have a usable poverty-rate estimate for one or both survey periods. I went ahead and excluded them since a margin of error could not be calculated from missing results.
+
+poverty_tested <- poverty_tested %>%
+  filter(poverty_rate_2010 >= 0,
+         poverty_rate_2017 >= 0)
+
+poverty_tested %>%
+  count(significant)
+  
+  
+  
+  
+#Part 3 (To be or not to be...)-
+
+
+# Supported: The article's broader claim that poverty rates increased in parts of Philadelphia is supported by my analysis. When I compared the 2006-2010 and 2013-2017 ACS estimates, I found 65 census tracts with poverty-rate changes that were statistically distinguishable from zero at the 90% confidence level.
+
+# Not supported: The changes in 311 tracts were not statistically distinguishable from zero, so these changes cannot be treated as evidence of actual increases or decreases in poverty. Therefore, the data do not support interpreting every observed change as a meaningful change in poverty.
+
+# Cannot be determined: The claim that Holmesburg had the highest increase in poverty from 2% to 19%, can’t be determined from the available information. Yes, Holmesburg's general boundaries can be identified using publicly available neighborhood data. However, the exact neighborhood boundaries or the census tracts used to calculate the articles climas are not provided. From this, I can’t determine whether the tracts corresponding to Holmesburg would produce the reported 2% and 19% values or whether Holmesburg had the largest increase among all Philadelphia neighborhoods. The available data simply can’t verify the article's specific Holmesburg ranking.
+
+
+
+
+
+# Part 4 (Retry)-
+
+
+# Original Articles Claim: "The more detailed survey released on Thursday revealed that the poverty rates in 22 majority-white neighborhoods in Philadelphia increased between the 2006-10 survey and the 2013-17 survey  — in some cases quite dramatically.Holmesburg recorded the highest increase, from 2 percent to 19 percent."
+
+# Rewritten Accurate claim: Poverty rates changed across Philadelphia between the 2006–10 and 2013–17 survey periods. Some areas experienced substantial increases in poverty. A census-tract analysis found that poverty rates increased significantly in 65 Philadelphia tracts, while changes in 311 tracts were not statistically distinguishable from zero. The results show that poverty increased in some parts of the city, but the changes were not uniform across Philadelphia. 
+
+
+
+
+
+# Evidence (Bar, Bar & Table)-
+
+
+poverty_tested %>%
+  filter(significant, change > 0) %>%
+  arrange(desc(change)) %>%
+  slice_head(n = 15) %>%
+  ggplot(aes(x = reorder(GEOID, change), y = change)) +
+  geom_col(fill = "pink") +
+  geom_errorbar(
+    aes(ymin = change - moe_diff,
+        ymax = change + moe_diff),
+    width = 0.3
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    title = "Philadelphia tracts with the largest detectable increases in poverty",
+    subtitle = "2010 vs. 2017 ACS 5-year estimates",
+    x = "Census tract",
+    y = "Change in poverty rate (percentage points)"
+  )
+
+
+library(gt)
+
+reliability_table <- poverty_2017 %>%
+  mutate(
+    dot = case_when(
+      cv < 12 ~ "🟢",
+      cv <= 40 ~ "🟡",
+      cv > 40 ~ "🔴"
+    )
+  ) %>%
+  arrange(desc(cv)) %>%
+  select(dot, GEOID, poverty_rate, poverty_moe, cv, reliability)
+
+reliability_table %>%
+  gt() %>%
+  fmt_number(columns = c(poverty_rate, poverty_moe), decimals = 1) %>%
+  fmt_number(columns = cv, decimals = 1) %>%
+  cols_label(
+    dot = "",
+    GEOID = "Census tract",
+    poverty_rate = "Poverty rate (%)",
+    poverty_moe = "MOE",
+    cv = "CV (%)",
+    reliability = "Reliability"
+  ) %>%
+  cols_align(align = "center", columns = dot) %>%
+  tab_header(
+    title = "Poverty Rate Reliability",
+    subtitle = "Philadelphia census tracts, ACS 2017 5-year estimates"
+  ) %>%
+  tab_source_note(
+    "Reliability thresholds follow Jurjevich et al. (2018): CV < 12% reliable, 12–40% somewhat reliable, > 40% unreliable."
+  )
+
+---
+
+poverty_tested %>%
+  mutate(
+    direction = case_when(
+      change > 0 ~ "Increase",
+      change < 0 ~ "Decrease",
+      TRUE ~ "No change"
+    )
+  ) %>%
+  count(direction) %>%
+  ggplot(aes(x = direction, y = n)) +
+  geom_col(fill = "orange") +
+  theme_minimal() +
+  labs(
+    title = "Direction of Poverty-Rate Change Across Philadelphia Tracts",
+    subtitle = "2010 vs. 2017 ACS 5-year estimates",
+    x = NULL,
+    y = "Number of census tracts"
+  )

@@ -48,12 +48,12 @@ This is the same `get_acs()` call you already know. The only new part is `geomet
 philly_tracts <- get_acs(
   geography = "tract",
   state = "PA",
-  county = "___",
+  county = "Philadelphia",
   variables = c(med_inc = "B19013_001",
                 total_pop = "B01003_001"),
   year = 2023,
   output = "wide",
-  geometry = ___
+  geometry = TRUE
 )
 
 class(philly_tracts)
@@ -69,7 +69,7 @@ Now repeat the Week 3 steps. **A data frame goes in, a data frame comes out.** T
 philly_tracts <- philly_tracts %>%
   filter(total_popE > 0) %>%
   mutate(
-    med_inc_se = med_incM / ___,
+    med_inc_se = med_incM / 1.645,
     med_inc_cv = (med_inc_se / med_incE) * 100,
     reliability = case_when(
       med_inc_cv < 12  ~ "High",
@@ -80,14 +80,15 @@ philly_tracts <- philly_tracts %>%
 
 # Did geometry survive? It should.
 names(philly_tracts)
+#
 ```
+#Your first map. It's just ggplot with a new geom:
 
-Your first map. It's just ggplot with a new geom:
 
 ```{r}
 #| label: first-map
 ggplot(philly_tracts) +
-  geom_sf(aes(fill = ___), color = NA) +
+  geom_sf(aes(fill = med_incE), color = NA) +
   scale_fill_viridis_c(labels = scales::dollar) +
   theme_void() +
   labs(title = "Median household income, Philadelphia tracts",
@@ -99,7 +100,7 @@ ggplot(philly_tracts) +
 ```{r}
 #| label: na-check
 philly_tracts %>%
-  filter(is.na(___)) %>%
+  filter(is.na(med_incE)) %>%
   nrow()
 ```
 

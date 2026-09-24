@@ -3,19 +3,25 @@ library(tidycensus)
 
 county_data <- get_acs(
   geography = "county",
-  variables = my_variable,
-  state = my_state,
+  variables = "B17001_001",
+  state = "Florida",
   year = 2023,
   survey = "acs5"
 )
 
+
+
+
+
 county_data <- county_data %>%
   mutate(moe_pct = moe / estimate * 100)
 
+
+
 county_data <- county_data %>%
   mutate(reliability = case_when(
-    moe_pct < 5  ~ "High confidence",
-    moe_pct < 10 ~ "Moderate",
+    moe_pct < 0.05  ~ "High confidence",
+    moe_pct < 0.1 ~ "Moderate",
     TRUE         ~ "Low confidence"
   ))
 
@@ -65,7 +71,7 @@ county_data %>%
 
 county_data %>%
   arrange(desc(moe_pct)) %>%
-  mutate(NAME = str_remove(NAME, " County, New York")) %>%
+  mutate(NAME = str_remove(NAME, " County, Florida")) %>%
   slice_head(n = 15) %>%
   ggplot(aes(x = reorder(NAME, estimate), y = estimate)) +
   geom_col() +
@@ -76,7 +82,7 @@ county_data %>%
 
 county_data %>%
   arrange(desc(moe_pct)) %>%
-  mutate(NAME = str_remove(NAME, " County, New York")) %>%
+  mutate(NAME = str_remove(NAME, " County, Florida")) %>%
   slice_head(n = 15) %>%
   ggplot(aes(x = reorder(NAME, estimate), y = estimate)) +
   geom_col() +
@@ -98,7 +104,7 @@ county_data %>%
 
 county_data %>%
   arrange(desc(moe_pct)) %>%
-  mutate(NAME = str_remove(NAME, " County, New York")) %>%
+  mutate(NAME = str_remove(NAME, " County, Florida")) %>%
   slice_head(n = 15) %>%
   ggplot(aes(x = reorder(NAME, estimate), y = estimate)) +
   geom_col(fill = "steelblue") +
