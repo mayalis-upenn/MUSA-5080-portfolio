@@ -1,26 +1,26 @@
 ---
-  title: "Verify the Claim: Holmesburg recorded the highest increase, from 2 percent to 19 percent between the 2006-10 survey and the 2013-17 survey"
+title: "Verify the Claim: Holmesburg recorded the highest increase, from 2 percent to 19 percent between the 2006-10 survey and the 2013-17 survey"
 author: "Maya Lis"
 date: today
 format:
   html:
-  toc: true
-code-fold: true
-code-summary: "Show code"
-embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    embed-resources: true
 ---
 
 
 
-#Part 1 (Introduction)-
+# Part 1 (Introduction)-
 
 
-#My two variables include the following; B17001_001: Poverty Status in the Past 12 Months by Sex by Age and and B17001_002 refers to the total number of people in poverty. Dividing the number of people below poverty by the total population for which poverty is calculated allows me to calculate the poverty rate and compare it between the surveys.I used the acs5 since the claim from the article uses data from the acs5 to compare two years. I used the surveys from 2010 and 2017.The survey periods the articles bases its claims on do not overlap.
+# My two variables include the following; B17001_001: Poverty Status in the Past 12 Months by Sex by Age and and B17001_002 refers to the total number of people in poverty. Dividing the number of people below poverty by the total population for which poverty is calculated allows me to calculate the poverty rate and compare it between the surveys.I used the acs5 since the claim from the article uses data from the acs5 to compare two years. I used the surveys from 2010 and 2017.The survey periods the articles bases its claims on do not overlap.
 
 
 
 
-#Part 2 (Here we go...)-
+# Part 2 (Here we go...)-
 
 
 library(tidycensus)
@@ -182,7 +182,7 @@ poverty_tested %>%
   
   
   
-#Part 3 (To be or not to be...)-
+# Part 3 (To be or not to be...)-
 
 
 # Supported: The article's broader claim that poverty rates increased in parts of Philadelphia is supported by my analysis. When I compared the 2006-2010 and 2013-2017 ACS estimates, I found 65 census tracts with poverty-rate changes that were statistically distinguishable from zero at the 90% confidence level.
