@@ -12,20 +12,22 @@ format:
 
 
 
-# Part 1 (Introduction)-
+# Part 1-
 
 
-# My two variables include the following; B17001_001: Poverty Status in the Past 12 Months by Sex by Age and and B17001_002 refers to the total number of people in poverty. Dividing the number of people below poverty by the total population for which poverty is calculated allows me to calculate the poverty rate and compare it between the surveys.I used the acs5 since the claim from the article uses data from the acs5 to compare two years. I used the surveys from 2010 and 2017.The survey periods the articles bases its claims on do not overlap.
+My two variables include the following; B17001_001: Poverty Status in the Past 12 Months by Sex by Age and and B17001_002 refers to the total number of people in poverty. Dividing the number of people below poverty by the total population for which poverty is calculated allows me to calculate the poverty rate and compare it between the surveys.I used the acs5 since the claim from the article uses data from the acs5 to compare two years. I used the surveys from 2010 and 2017.The survey periods the articles bases its claims on do not overlap.
 
 
 
 
-# Part 2 (Here we go...)-
+# Part 2)-
 
-
+```{r}
 library(tidycensus)
 library(tidyverse)
+```
 
+```{r}
 my_state <- "PA"
 my_variable <- c("B17001_001", "B17001_002")
 
@@ -40,7 +42,9 @@ poverty_2010 <- get_acs(
 )
 
 head(poverty_2010)
+```
 
+```{r}
 poverty_2017 <- get_acs(
   geography = "tract",
   variables = my_variable,
@@ -52,8 +56,11 @@ poverty_2017 <- get_acs(
 )
 
 head(poverty_2017)
+```
 
+## Calculating the 2010 Poverty Rate
 
+```{r}
 poverty_2010 <- poverty_2010 %>%
   mutate(
     poverty_rate = B17001_002E / B17001_001E * 100,
@@ -68,7 +75,9 @@ poverty_2010 <- poverty_2010 %>%
 
 
 head(poverty_2010)
+```
 
+```{r}
 poverty_2010 %>%
   select(NAME, poverty_rate, poverty_moe, cv) %>%
   head(10)
@@ -87,7 +96,11 @@ poverty_2017 <- poverty_2017 %>%
 
 
 head(poverty_2017)
+```
 
+## Measuring Reliability
+
+```{r}
 poverty_2017 <- poverty_2017 %>%
   mutate(
     reliability = case_when(
@@ -117,6 +130,11 @@ poverty_2010 %>%
 poverty_2017 %>%
   select(GEOID, poverty_rate, poverty_moe, cv, reliability) %>%
   head(10)
+```
+
+## Comparing 2010 and 2017
+
+```{r}
 
 poverty_2010_change <- poverty_2010 %>%
   select(GEOID, poverty_rate, poverty_moe)
@@ -147,6 +165,11 @@ poverty_change <- poverty_change %>%
 
 head(poverty_change)
 
+```
+
+## Statistically Detectable?
+```{r}
+
 poverty_tested <- poverty_change %>%
   mutate(
     se_2010 = poverty_moe_2010 / 1.645,
@@ -169,46 +192,47 @@ poverty_tested %>%
 poverty_tested %>%
   arrange(z) %>%
   tail(20)
+```
 
-# 65 tracts show a statistically detectable change at a 90% confidence interval, while 311 tracts do not. There are 8 tracts with NA results. Looking at the data set, it appears all of these NA tracts did not have a usable poverty-rate estimate for one or both survey periods. I went ahead and excluded them since a margin of error could not be calculated from missing results.
+65 tracts show a statistically detectable change at a 90% confidence interval, while 311 tracts do not. There are 8 tracts with NA results. Looking at the data set, it appears all of these NA tracts did not have a usable poverty-rate estimate for one or both survey periods. I went ahead and excluded them since a margin of error could not be calculated from missing results.
 
+```{r}
 poverty_tested <- poverty_tested %>%
   filter(poverty_rate_2010 >= 0,
          poverty_rate_2017 >= 0)
 
 poverty_tested %>%
   count(significant)
+```
   
   
-  
-  
-# Part 3 (To be or not to be...)-
+# Part 3-
 
 
-# Supported: The article's broader claim that poverty rates increased in parts of Philadelphia is supported by my analysis. When I compared the 2006-2010 and 2013-2017 ACS estimates, I found 65 census tracts with poverty-rate changes that were statistically distinguishable from zero at the 90% confidence level.
+**Supported:** The article's broader claim that poverty rates increased in parts of Philadelphia is supported by my analysis. When I compared the 2006-2010 and 2013-2017 ACS estimates, I found 65 census tracts with poverty-rate changes that were statistically distinguishable from zero at the 90% confidence level.
 
-# Not supported: The changes in 311 tracts were not statistically distinguishable from zero, so these changes cannot be treated as evidence of actual increases or decreases in poverty. Therefore, the data do not support interpreting every observed change as a meaningful change in poverty.
+**Not supported:** The changes in 311 tracts were not statistically distinguishable from zero, so these changes cannot be treated as evidence of actual increases or decreases in poverty. Therefore, the data do not support interpreting every observed change as a meaningful change in poverty.
 
-# Cannot be determined: The claim that Holmesburg had the highest increase in poverty from 2% to 19%, can’t be determined from the available information. Yes, Holmesburg's general boundaries can be identified using publicly available neighborhood data. However, the exact neighborhood boundaries or the census tracts used to calculate the articles climas are not provided. From this, I can’t determine whether the tracts corresponding to Holmesburg would produce the reported 2% and 19% values or whether Holmesburg had the largest increase among all Philadelphia neighborhoods. The available data simply can’t verify the article's specific Holmesburg ranking.
-
+**Cannot be determined:** The claim that Holmesburg had the highest increase in poverty from 2% to 19%, can’t be determined from the available information. Yes, Holmesburg's general boundaries can be identified using publicly available neighborhood data. However, the exact neighborhood boundaries or the census tracts used to calculate the articles climas are not provided. From this, I can’t determine whether the tracts corresponding to Holmesburg would produce the reported 2% and 19% values or whether Holmesburg had the largest increase among all Philadelphia neighborhoods. The available data simply can’t verify the article's specific Holmesburg ranking.
 
 
 
 
-# Part 4 (Retry)-
+# Part 4-
 
 
-# Original Articles Claim: "The more detailed survey released on Thursday revealed that the poverty rates in 22 majority-white neighborhoods in Philadelphia increased between the 2006-10 survey and the 2013-17 survey  — in some cases quite dramatically.Holmesburg recorded the highest increase, from 2 percent to 19 percent."
+**Original Articles Claim:** "The more detailed survey released on Thursday revealed that the poverty rates in 22 majority-white neighborhoods in Philadelphia increased between the 2006-10 survey and the 2013-17 survey  — in some cases quite dramatically.Holmesburg recorded the highest increase, from 2 percent to 19 percent."
 
-# Rewritten Accurate claim: Poverty rates changed across Philadelphia between the 2006–10 and 2013–17 survey periods. Some areas experienced substantial increases in poverty. A census-tract analysis found that poverty rates increased significantly in 65 Philadelphia tracts, while changes in 311 tracts were not statistically distinguishable from zero. The results show that poverty increased in some parts of the city, but the changes were not uniform across Philadelphia. 
-
-
+**Rewritten Accurate claim:** Poverty rates changed across Philadelphia between the 2006–10 and 2013–17 survey periods. Some areas experienced substantial increases in poverty. A census-tract analysis found that poverty rates increased significantly in 65 Philadelphia tracts, while changes in 311 tracts were not statistically distinguishable from zero. The results show that poverty increased in some parts of the city, but the changes were not uniform across Philadelphia. 
 
 
 
-# Evidence (Bar, Bar & Table)-
 
+# Evidence-
 
+## Poverty-Rate Changes
+
+```{r}
 poverty_tested %>%
   filter(significant, change > 0) %>%
   arrange(desc(change)) %>%
@@ -230,7 +254,11 @@ poverty_tested %>%
     y = "Change in poverty rate (percentage points)"
   )
 
+```
 
+## Poverty Rate Reliability
+
+```{r}
 library(gt)
 
 reliability_table <- poverty_2017 %>%
@@ -265,8 +293,10 @@ reliability_table %>%
     "Reliability thresholds follow Jurjevich et al. (2018): CV < 12% reliable, 12–40% somewhat reliable, > 40% unreliable."
   )
 
----
+```
+## Direction of Poverty-Rate Change
 
+```{r}
 poverty_tested %>%
   mutate(
     direction = case_when(
@@ -285,3 +315,4 @@ poverty_tested %>%
     x = NULL,
     y = "Number of census tracts"
   )
+```
