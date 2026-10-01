@@ -15,7 +15,7 @@ The first part of the lab (Parts 0–7) is guided and builds your toolkit. **Typ
 
 > **The question:** A housing agency wants an *expected* rent for every Philadelphia tract, so it can flag tracts where rents run well above what we'd expect given who lives there.
 >
-> Is that a β̂ problem or a ŷ problem? Write your answer here before you start: ___
+> Is that a β̂ problem or a ŷ problem? Write your answer here before you start_
 
 ---
 
@@ -60,11 +60,11 @@ philly_tracts <- get_acs(
   year = 2023,
   output = "wide",
   geometry = TRUE
-) %>%
-  st_transform(2272)          # Pennsylvania South State Plane, feet
+)
+philly_tracts <- st_transform(philly_tracts, 2272)
 ```
 
-Now build the variables. **A data frame goes in, a data frame comes out.**
+#Now build the variables. **A data frame goes in, a data frame comes out.**
 
 ```{r}
 #| label: build-vars
