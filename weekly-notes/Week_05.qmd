@@ -1,0 +1,55 @@
+---
+title: "Week_05"
+format: html
+---
+
+9/25/26
+Alll about prediction 
+Macihine learning is trying to predict something based off of a certain set of provided variables 
+Imagine Y =f(x) + E   ← E is everything else 
+         Rent = function is unknown
+Features, variable, nidicators, columns all the same things 
+Parametric model= assume a functional form, is a straight line
+Nonparametirc model= not making a functional form assumption, much more stuff to estimate, wiggly line cause points can be everywhere
+Basically understand the output is the prediction and the input is some variable and then an inference 
+The line is an estimate of the relationship between two variables (rent & income in this example)
+M1 ← lm (med_rent  - med_inc , data=tracts)
+Your going to get an intercept
+Med_inc
+Standard error (S.E.)
+T-value
+P-value
+
+Way fo testing relationship to be statistically significant
+WIll throw a lot of variables together event if they are not exactl related
+Ex. if can’t have income and rent prices could have amount of people that eat cake and then rent prices (inference that if you eat cake have a lot of disposable income and so can pay higher rent)
+Estimate 
+SE
+T-value (when t is high thats very good, thats what we want)
+p-value
+690 (price of rent when incomes 0)
+38
+18.2
+<2e-26
+0.0081 (dollars of monthly rent)
+
+→ dollars of months rent per 0.0081 x 10,000 → $81/month
+
+For every annual increase in income we expect rent to go up $81
+0.0005
+16.2
+<2e-16
+
+
+Fit vs prediction
+R2= on the data it was fit to
+RMSE= lower is better, it’s in your units
+Cross valadatino (cv)= when you take  asubset of data to train your model but then you ask okay if I took 80 srets from data to train model what if you picked a different 80, your data would be different 
+K-fold= can test however many times you want but is a way of attaining the RMSE
+Ex. 5-fold → run test 5 times & average RMSE to get the answer 
+In the exercise youll do 10 
+Overfitting= when the models learned the noise, it’s very good for the data it was made with but not good with other data
+Multicollineraity= mostly harmless but chekc your prediction
+Homoskedastic= points are everywhere, no patten to it
+Heteroskidastic= points are in a pattern
+It's a clue
