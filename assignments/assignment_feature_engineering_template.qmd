@@ -137,7 +137,7 @@ philly_tracts <- get_acs(
   output = "wide",
   geometry = TRUE
 ) %>%
-  st_transform(2272)
+  sf::st_transform(2272)
 ```
 
 ```{r}
@@ -300,18 +300,7 @@ Write the CV RMSE as a sentence, in your outcome's units: "On tracts it hasn't s
 
 Save this map. You'll compare it to your final model's map in Part 6.
 
-```{r}
-#| label: Baseline Map
-tracts <- tracts %>% mutate(resid_m1 = residuals(m1))
-
-ggplot(tracts) +
-  geom_sf(aes(fill = resid_m1), color = NA) +
-  scale_fill_gradient2(low = "#2166ac", mid = "grey95", high = "#b2182b", midpoint = 0, limits = c(-25, 25), breaks = c(-20, 0, 20)) +
-  theme_void() +
-  labs(title = "Baseline model: where it's wrong",
-       subtitle = "Red = actual higher than predicted",
-       fill = "Residual")
-```
+I inputted my map into the bottom by my final map for better comparrison...
 
 **Answer:** Where do the residuals cluster? What might those places have in common that your model doesn't know about? **Use this answer to choose your open data layers in Part 3.**
 
@@ -506,7 +495,8 @@ tracts <- tracts %>%
 Build **at least three spatial features** from your own layers, and use at least two types (count, density, nearest distance, distance to a place). After **each one**, fit a model, cross-validate it, and log it.
 
 ```{r}
-#| label: Feature 1: Does the number of SEPTA stops within a census tract help explain differences in poverty rates?
+
+#| label: : Does the number of SEPTA stops within a census tract help explain differences in poverty rates?
 
 tracts <- tracts %>%
   mutate(n_septa = lengths(st_intersects(., layer1)))
@@ -652,8 +642,11 @@ ggplot(tracts, aes(x = dist_ch_mi, y = y)) +
   theme_minimal()
 ```
 
+
+Is median household income skewed? 
+
 ```{r}
-#| label: Is median household income skewed?
+#| label: income-histograms
 ggplot(tracts, aes(x = med_incE)) +
   geom_histogram(bins = 30) +
   theme_minimal()
@@ -865,4 +858,3 @@ The log transformation of median income helped the most. It reduced the RMSE fro
 ## Submitting
 
 Render this document to HTML and submit the link on Canvas by Friday, October 16. I'll miss you all terribly while I'm away. Please send letters or correspondences to my office mailbox. 
-
