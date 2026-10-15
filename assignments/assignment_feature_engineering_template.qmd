@@ -106,7 +106,7 @@ Some ideas if you're stuck:
 | Mean travel time to work | Access to jobs | B08013_001 ÷ B08303_001 |
 | % of people below poverty | Targeting services | B17001 |
 | % of housing units vacant | Housing and blight | B25002 |
-| % of households overcrowded | Housing conditions | B25014 |
+| % of households overcrowded | Housing co nditions | B25014 |
 
 Use `load_variables(2023, "acs5")` to browse and find exact variable codes.
 
@@ -121,12 +121,17 @@ philly_tracts <- get_acs(
   state = "PA",
   county = "Philadelphia",
   variables = c(
-    total_pop = "B01003_001",
-    # your outcome's numerator and denominator (or median), e.g.:
-    # ___ = "___",
-    # ___ = "___",
-    # your baseline predictors, e.g.:
-    # ___ = "___"
+  poverty_total = "B17001_001", 
+  below_poverty = "B17001_002", 
+  total_pop = "B01003_001", 
+  med_inc = "B19013_001", 
+  occ_units = "B25003_001", 
+  renter_occ = "B25003_003", 
+  edu_total = "B15003_001", 
+  ba = "B15003_022", 
+  ma = "B15003_023", 
+  prof = "B15003_024", 
+  phd = "B15003_025"
   ),
   year = 2023,
   output = "wide",
@@ -139,14 +144,14 @@ philly_tracts <- get_acs(
 #| label: build-outcome
 philly_tracts <- philly_tracts %>%
   mutate(
-    # build your outcome, e.g. a percentage:
-    # y = ___E / ___E * 100,
-    # and its reliability. For a percentage, use tidycensus::moe_prop();
-    # for a median or count, use the E and M columns directly.
-    # y_moe = ___,
-    # y_cv  = (y_moe / 1.645) / y * 100
-    # your predictors:
-    # ___ = ___
+    y = below_povertyE / poverty_totalE * 100, 
+    y_moe = moe_prop( below_povertyE, 
+    poverty_totalE, 
+    below_povertyM, poverty_totalM ), 
+    y_cv = (y_moe / 1.645) / y * 100, pct_renter = renter_occE / occ_unitsE * 100, 
+    pct_ba = (baE + maE + profE + phdE) / edu_totalE * 100, 
+    area_sqmi = as.numeric(st_area(.)) / 27878400, 
+    pop_density = total_popE / area_sqmi
   )
 ```
 
@@ -156,10 +161,10 @@ Before you commit, check three things.
 
 ```{r}
 #| label: reliability
-# How many tracts have no value for your outcome?
+# How many tracts have no value for your outcome? 19
 sum(is.na(philly_tracts$y))
 
-# How reliable is it?
+# How reliable is it? The median reliability measure (y_cv) is 0.2805, but the mean and maximum are infinite since some tracts have a poverty rate of zero.
 summary(philly_tracts$y_cv)
 
 philly_tracts %>%
@@ -179,29 +184,53 @@ ggplot(philly_tracts, aes(x = y)) +
 
 If more than about a third of tracts have low reliability, consider a different outcome, or one built from larger counts. Write your reasoning either way.
 
+reliability   n
+1        High 388
+2         Low  20
+
 **Answer (2–3 sentences):** What is your outcome, why would an agency want to predict it, and how reliable is it?
 
-*Your answer:*
+*Your answer: My outcome is census tract poverty rate, and is calculated as the percentage of people living below the poverty rate. An agency would want to predict the poverty rate to identify areas across Philadelphia with greater need for services and resources. For the 408 total tracts, 388 where of high reliability, and 20 were at low reliability for a total of 4.9% in low reliability.   *
 
 ### 1C: Decide which tracts to model
 
 Filter once, here, and never again. Every later step uses `tracts`.
 
+This code chunk here is plugging in my 
+
 ```{r}
 #| label: filter
 tracts <- philly_tracts %>%
   filter(total_popE > 0,
-         !is.na(y)
-         # add !is.na() for each baseline predictor like in the in-class lab
+         !is.na(y), 
+         !is.na(med_incE), 
+         !is.na(pct_renter), 
+         !is.na(pct_ba), 
+         !is.na(pop_density) 
          )
 
 nrow(philly_tracts)
 nrow(tracts)
 ```
 
+```{r}
+#| label: figuring out the specifics of the tracts excluded
+philly_tracts %>%
+  st_drop_geometry() %>%
+  summarise(
+    missing_y = sum(is.na(y)),
+    missing_income = sum(is.na(med_incE)),
+    missing_renter = sum(is.na(pct_renter)),
+    missing_education = sum(is.na(pct_ba)),
+    missing_density = sum(is.na(pop_density)),
+    zero_population = sum(total_popE <= 0, na.rm = TRUE)
+  )
+```
+
+
 **Answer:** How many tracts did you lose, and what kinds of places are they?
 
-*Your answer:*
+*Your answer: I lost 27 tracts out of 408. The excluded tracts had missing values for one or more of the poverty, income, renter, or education variables, or had zero population identified. 17of the excluded tracts had zero-population recorded and so most likely are places with little residental development, perhaps wilderness.*
 
 ---
 
@@ -213,16 +242,46 @@ Plot your outcome against each predictor before modeling (the Week 3 habit).
 
 ```{r}
 #| label: look
-# one scatterplot per predictor, e.g.:
-# ggplot(tracts, aes(x = ___, y = y)) + geom_point(alpha = 0.5) +
-#   geom_smooth(method = "lm", se = FALSE) + theme_minimal()
+ggplot(tracts, aes(x = med_incE, y = y)) + geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) + theme_minimal()
+
+ggplot(tracts, aes(x = pct_renter, y = y)) + geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) + theme_minimal()
+
+ggplot(tracts, aes(x = pct_ba, y = y)) + geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) + theme_minimal()
+
+ggplot(tracts, aes(x = pop_density, y = y)) + geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) + theme_minimal()
 ```
 
 ### 2B: Fit and log
 
+library(caret)
+
+```{r}
+ctrl <- trainControl(method = "cv", number = 10)
+cv_rmse <- function(formula, data) {
+  df <- if (inherits(data, "sf")) st_drop_geometry(data) else data
+  vars <- all.vars(formula)
+  bad <- vars[sapply(vars, function(v) any(is.na(df[[v]])))]
+  if (length(bad) > 0) stop("These variables have NAs: ", paste(bad, collapse=", "), ". Fill them or choose another variable (Rule 1: don't drop rows).")
+  set.seed(5080)
+  fit <- train(formula, data=df, method="lm", trControl=ctrl)
+  fit$results$RMSE
+}
+```
+
 ```{r}
 #| label: m1
-f1 <- y ~ ___ + ___ + ___
+model_log <- tibble(
+  model = character(),
+  added = character(),
+  cv_rmse = double(),
+  notes = character()
+)
+
+f1 <- y ~ med_incE + pct_renter + pct_ba
 
 m1 <- lm(f1, data = tracts)
 summary(m1)
@@ -230,24 +289,24 @@ summary(m1)
 model_log <- model_log %>%
   add_row(model = "m1", added = "ACS baseline",
           cv_rmse = cv_rmse(f1, tracts),
-          notes = "___")
+          notes = "Median income, renter percentage, and bachelor's degree or higher")
 
 model_log
 ```
 
-Write the CV RMSE as a sentence, in your outcome's units: "On tracts it hasn't seen, the baseline model misses by about ___."
+Write the CV RMSE as a sentence, in your outcome's units: "On tracts it hasn't seen, the baseline model misses by about 9.28 percentage points."
 
 ### 2C: Where is the baseline wrong?
 
 Save this map. You'll compare it to your final model's map in Part 6.
 
 ```{r}
-#| label: resid-map-1
+#| label: Baseline Map
 tracts <- tracts %>% mutate(resid_m1 = residuals(m1))
 
 ggplot(tracts) +
   geom_sf(aes(fill = resid_m1), color = NA) +
-  scale_fill_gradient2(low = "#2166ac", mid = "grey95", high = "#b2182b", midpoint = 0) +
+  scale_fill_gradient2(low = "#2166ac", mid = "grey95", high = "#b2182b", midpoint = 0, limits = c(-25, 25), breaks = c(-20, 0, 20)) +
   theme_void() +
   labs(title = "Baseline model: where it's wrong",
        subtitle = "Red = actual higher than predicted",
@@ -256,7 +315,7 @@ ggplot(tracts) +
 
 **Answer:** Where do the residuals cluster? What might those places have in common that your model doesn't know about? **Use this answer to choose your open data layers in Part 3.**
 
-*Your answer:*
+*Your answer: The residuals cluster in central Philadelphia: in the North Philly and Center City areas. The red areas have higher actual poverty than predicted while the blue areas have actual poverty less than predicted.Since North Philly and center city are densely populated and vary widely in diversity of communities across each area, there are certainly some neighborhood factors that the areas might have in common. Measuring access to public transpiration, access to public services, and access to grocery stores will be importiant for improving the model. *
 
 ---
 
@@ -342,20 +401,35 @@ landmarks <- st_read("https://hub.arcgis.com/api/v3/datasets/6b2fe4a0fbe14e0a8e6
 Pull **at least two layers** that you think relate to your outcome. Base your choice on your Part 2C answer.
 
 ```{r}
-#| label: my-layers
-layer1 <- carto_get(
-  "SELECT the_geom, ___
-   FROM ___
-   WHERE ___"
+#| label: SEPTA trolley stops and Parks
+
+# Layer 1: SEPTA trolley stops
+layer1 <- st_read(
+  "https://hub.arcgis.com/api/v3/datasets/627fb25b9af14d2ab45fd3c8d65564b1_0/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1",
+  quiet = TRUE
 ) %>%
   st_transform(st_crs(tracts))
 
-layer2 <- ___
+# Layer 2: Parks
+layer2 <- st_read(
+  "https://opendata.arcgis.com/api/v3/datasets/6b2fe4a0fbe14e0a8e6afceaea230b8e_0/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1",
+  quiet = TRUE
+) %>%
+  filter(SUBTYPE == "Park") %>%
+  st_transform(st_crs(tracts))
+
+# Check the layers
+nrow(layer1)
+nrow(layer2)
+
+names(layer1)
+names(layer2)
+```
 ```
 
 **Answer:** Why these layers? What do you expect them to capture that the ACS variables don't?
 
-*Your answer:*
+*Your answer: I picked the Septa trolley stops as one of my layers as access to public trasnportation is typically an linked to poverty. Higher access to reliable public transportation connect people with work oppurunities otherwise non reachable. I choose to narrow my second layer down to parks within Philadelphia. In poorer areas funding unfortunatly does not go towards parks and so access to parks is much more restricted than in welathier areas. Parks provide a better quality of life for residents. These spatial features can capture differences in access to transportation and green space that the ACS variables do not measure.
 
 ---
 
@@ -419,7 +493,7 @@ tracts <- tracts %>%
 Sometimes the "thing" is a single location, such as City Hall as a stand-in for the center of the regional economy.
 
 ```{r}
-#| label: city-hall
+#| label: city hall
 city_hall <- st_sfc(st_point(c(-75.1636, 39.9526)), crs = 4326) %>%
   st_transform(st_crs(tracts))
 
@@ -432,24 +506,101 @@ tracts <- tracts %>%
 Build **at least three spatial features** from your own layers, and use at least two types (count, density, nearest distance, distance to a place). After **each one**, fit a model, cross-validate it, and log it.
 
 ```{r}
-#| label: my-spatial
-tracts <- tracts %>%
-  mutate(___ = ___)
+#| label: Feature 1: Does the number of SEPTA stops within a census tract help explain differences in poverty rates?
 
-f2 <- y ~ ___
+tracts <- tracts %>%
+  mutate(n_septa = lengths(st_intersects(., layer1)))
+
+summary(tracts$n_septa)
+f2 <- y ~ med_incE + pct_renter + pct_ba + n_septa
+
+m2 <- lm(f2, data = tracts)
 
 model_log <- model_log %>%
-  add_row(model = "m2", added = "___",
-          cv_rmse = cv_rmse(f2, tracts),
-          notes = "___")
+  add_row(
+    model = "m2",
+    added = "SEPTA stop count",
+    cv_rmse = cv_rmse(f2, tracts),
+    notes = "Added number of SEPTA stops intersecting each tract"
+  )
 
-# repeat for each feature
 model_log
+
+#| label: : Does the number of parks within a census tract help explain differences in poverty rates?
+
+tracts <- tracts %>%
+  mutate(n_parks = lengths(st_intersects(., layer2)))
+
+summary(tracts$n_parks)
+
+f3 <- y ~ med_incE + pct_renter + pct_ba + n_septa + n_parks
+
+m3 <- lm(f3, data = tracts)
+
+model_log <- model_log %>%
+  add_row(
+    model = "m3",
+    added = "Park count",
+    cv_rmse = cv_rmse(f3, tracts),
+    notes = "Added number of parks intersecting each tract"
+  )
+
+model_log
+
+
+#| label: Does the density of SEPTA stops help explain poverty rates after accounting for differences in tract size?
+
+tracts <- tracts %>%
+  mutate(
+    area_sqmi = as.numeric(st_area(.)) / 27878400,
+    septa_per_sqmi = n_septa / area_sqmi
+  )
+
+summary(tracts$septa_per_sqmi)
+
+f4 <- y ~ med_incE + pct_renter + pct_ba + septa_per_sqmi
+
+m4 <- lm(f4, data = tracts)
+
+model_log <- model_log %>%
+  add_row(
+    model = "m4",
+    added = "SEPTA stops per square mile",
+    cv_rmse = cv_rmse(f4, tracts),
+    notes = "Added SEPTA stop density to account for tract area"
+  )
+
+model_log
+
+#| label: Does the density of parks help explain poverty rates after accounting for differences in tract size?
+
+tracts <- tracts %>%
+  mutate(
+    parks_per_sqmi = n_parks / area_sqmi
+  )
+
+summary(tracts$parks_per_sqmi)
+
+f5 <- y ~ med_incE + pct_renter + pct_ba + parks_per_sqmi
+
+m5 <- lm(f5, data = tracts)
+
+model_log <- model_log %>%
+  add_row(
+    model = "m5",
+    added = "Parks per square mile",
+    cv_rmse = cv_rmse(f5, tracts),
+    notes = "Added park density to account for tract area"
+  )
+
+model_log
+
 ```
 
 **Answer:** Which spatial feature helped most? Did any feature you expected to help do nothing, or make CV RMSE worse? Why might that be?
 
-*Your answer:*
+*Your answer: Suprisingly, none of the spatial features helped improve the model. The feature that decreased the model the least was the added number of SEPTA stops intersecting each tract. Honestly, I expected all of the features to improve the model. I suppose my baseline model already captured many of the neighborhood differences associated with poverty in the ACS variables. The spatial features could possibly not have enough information to improve the model. For example, the number of SEPTA stops or parks does not always reflect excatly how accessible they are to the public.*
+
 
 ---
 
@@ -501,6 +652,20 @@ ggplot(tracts, aes(x = dist_ch_mi, y = y)) +
   theme_minimal()
 ```
 
+```{r}
+#| label: Is median household income skewed?
+ggplot(tracts, aes(x = med_incE)) +
+  geom_histogram(bins = 30) +
+  theme_minimal()
+
+ggplot(tracts, aes(x = log1p(med_incE))) +
+  geom_histogram(bins = 30) +
+  theme_minimal()
+```
+
+
+*Anwser: Not really, pretty normal distribtuion*
+
 ### 5C: Categorical variables
 
 Sometimes a number works better as groups, either because the relationship isn't smooth or because the categories are meaningful. You can make categories from any variable with `case_when()` or `cut()`, and then make sure R treats them as a **factor**.
@@ -535,24 +700,81 @@ If a category has only a handful of tracts, its coefficient is unstable, and in 
 Try **at least one of each**: a log, a squared term, and a categorical variable. Choose which variables to transform based on your plots, not at random. Log each model.
 
 ```{r}
-#| label: my-transforms
-f_log <- y ~ ___
+#| label: my transformations
+# Log example- Does population density helps predict poverty rates when you transform density using a logarith?
+f_log <- y ~ med_incE + pct_renter + pct_ba + log1p(pop_density)
 
 model_log <- model_log %>%
-  add_row(model = "m_", added = "log of ___",
+  add_row(model = "m6", added = "Log population density",
           cv_rmse = cv_rmse(f_log, tracts),
-          notes = "___")
+          notes = "Tested log1p transformation of population density")
 
-# squared term
+# How far is each Philadelphia census tract from City Hall? Does that distance helps predict the tract's poverty rate?
 
-# categorical
+city_hall <- st_sfc(
+  st_point(c(-75.1636, 39.9526)),
+  crs = 4326
+) %>%
+  st_transform(st_crs(tracts))
+
+tract_pts <- st_point_on_surface(tracts)
+
+tracts <- tracts %>%
+  mutate(
+    dist_ch_mi = as.numeric(
+      st_distance(tract_pts, city_hall)
+    ) / 5280
+  )
+
+m_sq <- lm(y ~ dist_ch_mi + I(dist_ch_mi^2), data = tracts)
+summary(m_sq)
+
+f_sq <- y ~ med_incE + pct_renter + pct_ba + dist_ch_mi + I(dist_ch_mi^2)
+
+model_log <- model_log %>%
+  add_row(model = "m7", added = "Squared distance to City Hall",
+          cv_rmse = cv_rmse(f_sq, tracts),
+          notes = "Tested a squared distance term")
+          
+# Do poverty rates between census tracts near Philadelphia city hall and those farther away differ?”
+
+"dist_ch_mi" %in% names(tracts)
+
+tracts <- tracts %>%
+  mutate(
+    ring = case_when(
+      dist_ch_mi < 2 ~ "Core",
+      dist_ch_mi < 5 ~ "Inner",
+      TRUE           ~ "Outer"
+    ),
+    ring = factor(ring, levels = c("Core", "Inner", "Outer"))
+  )
+
+tracts %>% st_drop_geometry() %>% count(ring)
+
+m_cat <- lm(y ~ ring, data = tracts)
+summary(m_cat)
+
+
+#| label: log-income-model
+
+f_log_income <- y ~ log1p(med_incE) + pct_renter + pct_ba
+
+model_log <- model_log %>%
+  add_row(
+    model = "m6_income",
+    added = "Log median household income",
+    cv_rmse = cv_rmse(f_log_income, tracts),
+     notes = "Tested log1p transformation of median household income",
+  )
 
 model_log
+
+summary(m_cat)
 ```
 
-**Answer:** Which transformation helped most? For your categorical variable, write one sentence reading one of its coefficients correctly, naming the reference level.
+**Answer:** The log transformatino of median income helped the most. It reduced the RMSE from the baseline 9.28 to 8.18 in the  model. Using core as the reference level, inner census tracts have a predicted poverty rate 11.748 percentage points higher than core tract.
 
-*Your answer:*
 
 ---
 
@@ -562,15 +784,17 @@ Combine the features and transformations that earned their place, **judged by CV
 
 ```{r}
 #| label: final
-f_final <- y ~ ___
+f_final <- y ~ log1p(med_incE) + pct_renter + pct_ba +
+  dist_ch_mi + I(dist_ch_mi^2)
 
 m_final <- lm(f_final, data = tracts)
 summary(m_final)
 
 model_log <- model_log %>%
-  add_row(model = "final", added = "___",
+  add_row(model = "final",
+          added = "Log median income and squared distance",
           cv_rmse = cv_rmse(f_final, tracts),
-          notes = "___")
+          notes = "Combined the best-performing log and squared-term transformations")
 
 model_log
 ```
@@ -578,21 +802,38 @@ model_log
 ### Where is the final model wrong?
 
 ```{r}
-#| label: resid-map-2
+#| label: Final Map
 tracts <- tracts %>% mutate(resid_final = residuals(m_final))
 
 ggplot(tracts) +
   geom_sf(aes(fill = resid_final), color = NA) +
-  scale_fill_gradient2(low = "#2166ac", mid = "grey95", high = "#b2182b", midpoint = 0) +
+  scale_fill_gradient2(low = "#2166ac", mid = "grey95", high = "#b2182b", midpoint = 0, limits = c(-25, 25), breaks = c(-20, 0, 20)) +
   theme_void() +
   labs(title = "Final model: where it's wrong",
        subtitle = "Red = actual higher than predicted",
        fill = "Residual")
 ```
 
+
+```{r}
+#| label: Baseline Map
+tracts <- tracts %>% mutate(resid_m1 = residuals(m1))
+
+ggplot(tracts) +
+  geom_sf(aes(fill = resid_m1), color = NA) +
+  scale_fill_gradient2(low = "#2166ac", mid = "grey95", high = "#b2182b", midpoint = 0, limits = c(-25, 25), breaks = c(-20, 0, 20)) +
+  theme_void() +
+  labs(title = "Baseline model: where it's wrong",
+       subtitle = "Red = actual higher than predicted",
+       fill = "Residual")
+```
 Put your two residual maps side by side, or put them next to each other in the rendered document. Did the clusters from Part 2C shrink? Where did they stay?
 
+The maps generally look extremely simillar. It looks like the clusters of overprediction and underprediction remain in Central and North Philly. However, I do notice that in my final map some areas that were darker either red or blue are slightly lighter which is good. This shows that the residual was closer to zero meaning the predicted poverty rate was close to the actual rate of poverty in those areas. The map therefore shows a gradual improvment from baseline to final.
+
 ### Are the biggest misses in the least reliable tracts?
+
+The biggest misses are not concentrated only in the least reliable tracts. My plot shows a curved relationship. Points also appear scattered throughout the plot showing that uncertainty alone does not explain the model's largest errors
 
 ```{r}
 #| label: fog
@@ -614,7 +855,10 @@ Answer in prose, drawing on your model log (incorporate our words of the day for
 3. **What's still missing?** Look at your final residual map. Name one thing about those places you'd want to measure next, and where you might get the data.
 4. **How much of the remaining error might be uncertainty or statistical noise?** Use your last plot.
 
-*Your answer:*
+*Your answer: 
+
+The log transformation of median income helped the most. It reduced the RMSE from the baseline 9.28 to 8.18 in the m6 model. This could possibly be becasue the relationship between income and poverty is not linear. The squared distance to city hall had a score of 8.74 and so also helped lower the score. All my other features did'nt really help improve the model, the spatial features especially. Adding SEPTA stop count increased CV RMSE to 9.30, while park count increased it to 9.31. SEPTA stops per square mile performed worst, with a CV RMSE of 9.35.I suppose simple counts and densities don't measure the full accessibility and quality of the resources being counted and calculated. I'm choosing to asess the vairiable pct_ba, aka the percent of adults with a bachelor's degree or higher.The coeeficent is -0.06862. From what I understand, for a  β̂  reading: a one percentage point increase in the percentage of adults with a bachelor's degree or higher is associated with a 0.0686 percentage-point decrease in the poverty rate, if the other variables remain constant. And from what I understadn for a ŷ reading: comparing two otherwise similar census tracts, a 10 percentage point increase in the percentage of adults with a bachelor's degree or higher is associated with a predicted 0.686 percentage-point decrease in the poverty rate. There are still large clusters of error in central and north phillly. I would want to measure access to grocery stores next to be able to understand if those areas are in areas of food deserts. I could get the data of course through openphilly. My plot shows a possible curved relationship between uncertainty in the poverty rate estimate and the size of the prediction errors.Many tracts with moderate uncertainty have small errors, but some tracts across the range have larger errors. So, uncertainty in the ACS estimates may explain part of the remaining error, but it can't explain it all. *
+
 
 ---
 
