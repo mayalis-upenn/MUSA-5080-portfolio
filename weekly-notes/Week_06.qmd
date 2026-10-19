@@ -1,0 +1,23 @@
+---
+title: "Week_06"
+format: html
+---
+
+10/16/26 - Where's the model wrong?
+
+If a variable has very low-no observatinos in linear model will destroy your model: can merge variables, exclude it 
+Can use buffe count and KNN to calculate distances to different variables
+
+KNN= K nearest neighbors
+
+Toblers first law of geography= all things are related but near things are more related
+
+Spatial lag= average value of all of the neighbors
+
+Is there a relationship between my and my nieghbors errors?
+Were not going to use this because it gives information already to the model 
+
+Moran's eye= equation that, measures spatial autocorrelation (clustering, dispersion, or randomness) across a dataset
+
+Values close to 0= ranadomness values close to 1= clustreing
+Use it as guidance, do I need to go out and add things to my model
