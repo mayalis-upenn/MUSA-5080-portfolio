@@ -46,7 +46,7 @@
     "href": "weekly-notes/index.html",
     "title": "Weekly Notes",
     "section": "",
-    "text": "Notes from each week of MUSA 5080. New entries appear here automatically — add a .qmd file to this folder and render.\n\n\n\n\n\n\n\n\n\n\n\nWeek_05\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek_03\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek_04\n\n\n\n\n\n\n\n\n\n\n\n\n\nWeek 2: dplyr and Census\n\n\nTable functions and acs data.\n\n\n\n\n\nSep 4, 2026\n\n\n\n\n\n\n\nWeek 1: Getting Set Up\n\n\nFirst impressions, and getting the workflow running.\n\n\n\n\n\nAug 28, 2026\n\n\n\n\n\nNo matching items"
+    "text": "Notes from each week of MUSA 5080. New entries appear here automatically — add a .qmd file to this folder and render.\n\n\n\n\n\n\n\n\n\n\n\nWeek_05\n\n\n\n\n\n\n\n\n\n\n\n\n\nWeek_06\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek_03\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek_04\n\n\n\n\n\n\n\n\n\n\n\n\n\nWeek 2: dplyr and Census\n\n\nTable functions and acs data.\n\n\n\n\n\nSep 4, 2026\n\n\n\n\n\n\n\nWeek 1: Getting Set Up\n\n\nFirst impressions, and getting the workflow running.\n\n\n\n\n\nAug 28, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "data/readme.html",
@@ -453,5 +453,12 @@
     "title": "Assignment: Building Features, Watching What Happens",
     "section": "Submitting",
     "text": "Submitting\nRender this document to HTML and submit the link on Canvas by Friday, October 16. I’ll miss you all terribly while I’m away. Please send letters or correspondences to my office mailbox."
+  },
+  {
+    "objectID": "weekly-notes/Week_06.html",
+    "href": "weekly-notes/Week_06.html",
+    "title": "Week_06",
+    "section": "",
+    "text": "10/16/26 - Where’s the model wrong?\nIf a variable has very low-no observatinos in linear model will destroy your model: can merge variables, exclude it Can use buffe count and KNN to calculate distances to different variables\nKNN= K nearest neighbors\nToblers first law of geography= all things are related but near things are more related\nSpatial lag= average value of all of the neighbors\nIs there a relationship between my and my nieghbors errors? Were not going to use this because it gives information already to the model\nMoran’s eye= equation that, measures spatial autocorrelation (clustering, dispersion, or randomness) across a dataset\nValues close to 0= ranadomness values close to 1= clustreing Use it as guidance, do I need to go out and add things to my model"
   }
 ]
