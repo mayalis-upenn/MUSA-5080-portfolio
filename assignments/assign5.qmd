@@ -186,7 +186,6 @@ train_sales <- all_sales %>%
 
 View(train_sales)
 
-# Count houses before and after cleaning
 all_sales %>%
   st_drop_geometry() %>%
   filter(split == "train") %>%
@@ -194,7 +193,6 @@ all_sales %>%
 
 nrow(train_sales)
 
-# Number of houses removed
 all_sales %>%
   filter(split == "train") %>%
   nrow() - nrow(train_sales)
@@ -213,7 +211,7 @@ all_sales %>%
   )
 
 
-# Checked the minimum and maximum values to see if there were any crazy outliers in the labeled variables. here were none, but if there were I would have excluded them. 
+# Checked the minimum and maximum values to see if there were any crazy outliers in the labeled variables. There were none, but if there were I would have excluded them. 
 train_sales %>%
   st_drop_geometry() %>%
   summarise(
@@ -254,13 +252,65 @@ all_sales %>%
   filter(split == "train") %>%
   summarise(total_fireplaces = sum(num_fireplaces, na.rm = TRUE))
 
+# Distribution of Chicago house sale prices --> appears to be a pretty normal distribution 
+
+ggplot(train_sales) +
+  geom_histogram(aes(x = sale_price), bins = 40) +
+  scale_x_log10(labels = scales::label_dollar()) +
+  labs(
+    title = "Distribution of House Sale Prices",
+    x = "Sale price (log scale)",
+    y = "Number of houses"
+  ) +
+  theme_minimal()
+
+# Sale price versus building size -->  Explores if larger buildings tend to sell for more and smaller tend to sell for less. 
+
+ggplot(train_sales) +
+  geom_point(
+    aes(x = building_000sf, y = sale_price),
+    alpha = 0.3
+  ) +
+  scale_y_log10(labels = scales::label_dollar()) +
+  labs(
+    title = "Sale Price versus Building Size",
+    x = "Building size (thousands of square feet)",
+    y = "Sale price"
+  ) +
+  theme_minimal()
+
+# Sale price per number of bedrooms --> comparison of prices among houses with different number of bedrooms
+
+ggplot(train_sales) +
+  geom_boxplot(
+    aes(x = factor(num_bedrooms), y = sale_price)
+  ) +
+  scale_y_log10(labels = scales::label_dollar()) +
+  labs(
+    title = "Sale Price by Number of Bedrooms",
+    x = "Number of bedrooms",
+    y = "Sale price"
+  ) +
+  theme_minimal()
+
+# Map of sale prices --> Each point represents a house sale, colored by its sale price
+ggplot(train_sales) +
+  geom_sf(aes(color = sale_price), size = 0.7, alpha = 0.7) +
+  scale_color_viridis_c(labels = scales::label_dollar()) +
+  labs(
+    title = "Map of Chicago House Sale Prices",
+    color = "Sale price"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45))
+
 ```
 
 
 
 **Answer:** What in your exploration shaped your modeling choices?
 
-*Your answer:*
+*Your answer: I removed sales with prices below the 0.1st percentile or above the 99.9th percentile to reduce the influence of extreme values on my model. This removed 41 sales from the training dataset. I then checked for missing, zero, or negative sale prices. Since I found none, I did not need to remove any additional sales. I also examined the minimum and maximum values of the property variables to identify any unrealistic values and checked for negative values. These checks did not show any issues that required removing additional sales. I checked the dataset for missing values and found that num_fireplaces had 349 missing values. Since this variable had a substantial amount of missing information, I decided to exclude it from my model rather than risk having to account for those missing values during modeling.*
 
 ---
 
@@ -270,6 +320,112 @@ Start with a structure-only baseline. Then add features in steps you can learn f
 
 ```{r}
 #| label: part-2
+
+# Create an empty model log
+model_log <- tibble(
+  model   = character(),
+  added   = character(),
+  cv_rmse = numeric(),
+  moran_i = numeric(),
+  notes   = character()
+)
+
+# Model 0: Structure only baseline
+f0 <- sale_price ~ 1
+
+m0 <- lm(f0, data = train_sales)
+
+summary(m0)
+
+# Calculate 10-fold CV RMSE for the baseline
+set.seed(5080)
+
+folds <- createFolds(
+  train_sales$sale_price,
+  k = 10,
+  list = TRUE,
+  returnTrain = FALSE
+)
+
+fold_rmse <- numeric(length(folds))
+
+for (i in seq_along(folds)) {
+  test_rows <- folds[[i]]
+  train_rows <- setdiff(seq_len(nrow(train_sales)), test_rows)
+
+  predicted_price <- mean(train_sales$sale_price[train_rows])
+
+  fold_rmse[i] <- sqrt(mean(
+    (train_sales$sale_price[test_rows] - predicted_price)^2
+  ))
+}
+
+baseline_cv_rmse <- mean(fold_rmse)
+
+# Add baseline to the model log
+model_log <- model_log %>%
+  add_row(
+    model = "m0",
+    added = "Intercept only",
+    cv_rmse = baseline_cv_rmse,
+    moran_i = NA_real_,
+    notes = "Baseline predicting the mean sale price"
+  )
+
+# Model 1: Building size: Does building size improves price prediction?
+f1 <- sale_price ~ building_000sf
+
+m1 <- lm(f1, data = train_sales)
+
+summary(m1)
+
+model1_cv_rmse <- cv_rmse(f1, train_sales)
+
+model_log <- model_log %>%
+  add_row(
+    model = "m1",
+    added = "building_000sf",
+    cv_rmse = model1_cv_rmse,
+    moran_i = NA_real_,
+    notes = "Test whether building size improves price prediction"
+  )
+
+# Model 2: Building Age: Does the buildings age improve price prediction?
+f1 <- sale_price ~ building_age 
+
+m2 <- lm(f1, data = train_sales)
+
+summary(m2)
+
+model2_cv_rmse <- cv_rmse(f1, train_sales)
+
+model_log <- model_log %>%
+  add_row(
+    model = "m2",
+    added = "building_age",
+    cv_rmse = model2_cv_rmse,
+    moran_i = NA_real_,
+    notes = "Test whether building age improves price prediction"
+  )
+
+ summarise(
+    min_building_size = min(building_000sf, na.rm = TRUE),
+    min_building_age = min(building_age, na.rm = TRUE),
+    min_lot_size = min(lotsize_acre, na.rm = TRUE),
+    min_bedrooms = min(num_bedrooms, na.rm = TRUE),
+    max_bedrooms = max(num_bedrooms, na.rm = TRUE),
+    min_full_baths = min(num_full_baths, na.rm = TRUE),
+    max_full_baths = max(num_full_baths, na.rm = TRUE),
+    min_garage_size = min(garage_size, na.rm = TRUE),
+    max_garage_size = max(garage_size, na.rm = TRUE)
+  )
+
+
+# Display the model log
+model_log
+
+
+print(model_log, n = Inf)
 ```
 
 ---
